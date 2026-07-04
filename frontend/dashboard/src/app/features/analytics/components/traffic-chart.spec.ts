@@ -56,9 +56,44 @@ describe('TrafficChart', () => {
     });
 
     it('should cap y-axis ticks without forcing one tick per pageview', () => {
-        const options = (component as unknown as { chartOptions: () => { scales: { y: { ticks: { maxTicksLimit: number; stepSize?: number } } } } }).chartOptions();
+        const options = (component as unknown as { chartOptions: () => { yAxis: { splitNumber: number; interval?: number } } }).chartOptions();
 
-        expect(options.scales.y.ticks.maxTicksLimit).toBe(6);
-        expect(options.scales.y.ticks.stepSize).toBeUndefined();
+        expect(options.yAxis.splitNumber).toBe(6);
+        expect(options.yAxis.interval).toBeUndefined();
+    });
+
+    it('renders the ECharts directive instead of the PrimeNG chart element when traffic exists', () => {
+        fixture.componentRef.setInput('data', [
+            { time: '2026-07-01T00:00:00Z', pageviews: 12, visitors: 7 },
+            { time: '2026-07-02T00:00:00Z', pageviews: 18, visitors: 10 }
+        ]);
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.css('[echarts]'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('p-select'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('p-' + 'chart'))).toBeNull();
+    });
+
+    it('can render primary traffic series with the bar design variant and merge data updates', () => {
+        fixture.componentRef.setInput('data', [
+            { time: '2026-07-01T00:00:00Z', pageviews: 12, visitors: 7 },
+            { time: '2026-07-02T00:00:00Z', pageviews: 18, visitors: 10 }
+        ]);
+        fixture.componentRef.setInput('design', 'bar');
+        fixture.detectChanges();
+
+        const inspectable = component as unknown as {
+            chartFrameOptions: () => { series: { data: number[] }[] };
+            chartMergeOptions: () => { xAxis: { data: string[] }; series: { name: string; type: string; data: number[] }[] };
+            chartOptions: () => { series: { name: string; type: string }[] };
+        };
+        const options = inspectable.chartOptions();
+        const frame = inspectable.chartFrameOptions();
+        const merge = inspectable.chartMergeOptions();
+        expect(options.series.find((series) => series.name === 'dashboard.kpis.pageviews')?.type).toBe('bar');
+        expect(options.series.find((series) => series.name === 'dashboard.traffic.trendLine')?.type).toBe('line');
+        expect(frame.series.find((series) => series.data.length > 0)).toBeUndefined();
+        expect(merge.xAxis.data.length).toBe(2);
+        expect(merge.series.find((series) => series.name === 'dashboard.kpis.pageviews')?.data).toEqual([12, 18]);
     });
 });

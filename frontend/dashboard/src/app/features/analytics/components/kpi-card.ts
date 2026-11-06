@@ -57,7 +57,7 @@ export interface KpiCardModel {
                 @for (cue of updateCues(); track cue) {
                     <span class="hk-kpi-card__update-cue" [attr.data-update-cue]="cue" aria-hidden="true"></span>
                 }
-                <span class="hk-kpi-card__content text-sm font-medium text-muted-color">{{ label() }}</span>
+                <span class="hk-kpi-card__content text-xs font-semibold uppercase tracking-wider text-muted-color">{{ label() }}</span>
                 <div [class]="displayClass()">
                     @if (showSkeleton()) {
                         <p-skeleton width="60%" height="2rem" />
@@ -76,7 +76,7 @@ export interface KpiCardModel {
                 </div>
                 @let deltaValue = normalizedDelta();
                 @if (!showSkeleton() && deltaValue !== null) {
-                    <div class="hk-kpi-card__content flex items-center gap-1">
+                    <div class="hk-kpi-card__content flex items-center gap-1 mt-0.5">
                         <span [class]="deltaClass()"><app-animated-number [value]="deltaValue" [format]="deltaFormat" /></span>
                     </div>
                 }
@@ -85,6 +85,22 @@ export interface KpiCardModel {
     `,
     styles: [
         `
+            :host {
+                display: block;
+                height: 100%;
+            }
+
+            :host ::ng-deep .p-card {
+                border-radius: 0.75rem;
+                transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            :host ::ng-deep .p-card:hover {
+                transform: translateY(-2px);
+                border-color: color-mix(in srgb, var(--p-primary-color) 30%, var(--p-content-border-color));
+                box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+            }
+
             .hk-kpi-card__body {
                 border-radius: 0.5rem;
                 isolation: isolate;
@@ -154,8 +170,8 @@ export class KpiCard implements OnChanges, OnDestroy {
         if (normalized === null) return '';
         const positive = normalized >= 0;
         return positive
-            ? 'text-xs font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-            : 'text-xs font-medium px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+            ? 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/12 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 shadow-2xs'
+            : 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/12 text-rose-700 dark:text-rose-400 border border-rose-500/25 shadow-2xs';
     });
 
     ngOnChanges(changes: SimpleChanges): void {

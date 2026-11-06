@@ -60,10 +60,24 @@
     border: 1px solid var(--p-surface-border);
     border-radius: 0.75rem;
     overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+:host ::ng-deep .app-table__table .p-datatable-tbody > tr {
+    transition: background-color 0.15s ease-out;
+}
+
+:host ::ng-deep .app-table__table .p-datatable-tbody > tr:hover {
+    background: var(--p-content-hover-background);
 }
 
 :host ::ng-deep .app-table__table .p-datatable-thead > tr > th {
     white-space: nowrap;
+    background: color-mix(in srgb, var(--p-content-hover-background) 80%, var(--p-content-background));
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 .app-table__row--selectable {
